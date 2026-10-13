@@ -100,11 +100,15 @@ tr td:first-child{font-weight:700;white-space:nowrap;color:var(--red)}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 footer{border-top:1px solid var(--line);padding:20px;text-align:center;font-size:11px;color:var(--ink3);line-height:2}
 @media(max-width:720px){
-  .grid{grid-template-columns:repeat(4,1fr)}
-  .row{flex-direction:column}
-  .btn{padding:12px}
+  .grid{grid-template-columns:repeat(2,1fr)}
+  .row{flex-direction:column;gap:6px}
+  .row>div{flex:1 1 auto!important;width:100%!important}
+  .kw-row .input{flex:1 1 100%!important}
+  .kw-row .btn{flex:1 1 100%!important;width:100%!important}
+  .btn{padding:12px;width:100%;flex:1 1 auto}
   main{padding:20px 14px 50px}
   .panel{padding:16px}
+  .filter-btn{font-size:12px;padding:5px 10px}
 }
 </style>
 </head>
@@ -144,7 +148,7 @@ footer{border-top:1px solid var(--line);padding:20px;text-align:center;font-size
         </div>
         <div style="flex:2;margin-top:6px">
           <div style="font-size:14px;font-weight:600;color:#5a4a3a;margin-bottom:3px">注音</div>
-          <div style="display:flex;gap:8px">
+          <div style="display:flex;gap:8px;flex-wrap:wrap" class="kw-row">
             <input class="input" id="kw" placeholder="例：東" autocomplete="off" style="flex:1;height:42px">
             <button class="btn" id="goBtn" style="height:42px;white-space:nowrap;width:90px;flex:0 0 90px;padding:0;letter-spacing:0">查詢</button>
           </div>
