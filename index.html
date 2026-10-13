@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>音切音韻地位查詢</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='6' fill='%23c8402a'/%3E%3Ctext x='32' y='43' font-size='30' font-family='serif' font-weight='700' fill='%23f0e6d0' text-anchor='middle'%3E切%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://miaoda.feishu.cn">
+<link href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Serif+SC:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f7f4ec; --bg2:#efeadd; --card:#ffffff; --card2:#f3efe4;
+  --ink:#262626; --ink2:#5c5648; --ink3:#9a917f;
+  --line:#d8d0bc; --line2:#b8ad90;
+  --red:#8b2c2c; --red2:#a83a3a; --blue:#1e3a5f; --blue2:#2f5a8a; --gold:#a8842e; --green:#4a7a5e;
+  --shadow:0 2px 10px rgba(60,50,25,.08),0 8px 24px rgba(60,50,25,.06);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Noto Serif SC","Songti SC",serif;background:var(--bg);color:var(--ink);min-height:100vh;line-height:1.7}
+::selection{background:var(--blue);color:#fff}
+a{color:var(--blue2)}
+header{border-bottom:1px solid var(--line);background:linear-gradient(180deg,#fff,var(--bg))}
+.hd{max-width:960px;margin:0 auto;padding:26px 22px;display:flex;justify-content:space-between;align-items:center;gap:16px}
+.brand{display:flex;gap:14px;align-items:center;cursor:default}
+.seal{width:46px;height:46px;flex:0 0 46px;background:var(--blue);color:#f7f4ec;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;border-radius:4px;box-shadow:inset 0 0 0 2px #152c48,var(--shadow);user-select:none}
+.brand h1{font-size:21px;font-weight:900;letter-spacing:.1em;color:var(--blue)}
+.brand .sub{font-size:12px;color:var(--ink2);margin-top:3px;letter-spacing:.2em}
+.hd-tools button{background:#fff;border:1px solid var(--line2);color:var(--ink2);font-family:inherit;font-size:12px;padding:6px 14px;border-radius:3px;cursor:pointer}
+.hd-tools button:hover{color:var(--blue);border-color:var(--blue)}
+main{max-width:960px;margin:0 auto;padding:30px 22px 60px}
+.view{display:none}
+.view.active{display:block}
+.tabs{display:flex;gap:10px;margin-bottom:16px}
+.tab{font-family:inherit;font-size:14px;padding:8px 22px;border:1px solid var(--line2);background:#fff;color:var(--ink2);cursor:pointer;border-radius:3px;letter-spacing:.1em}
+.tab.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:4px 24px;box-shadow:var(--shadow)}
+.tip{font-size:13px;color:var(--ink3);margin-bottom:14px;letter-spacing:.05em}
+.row{display:flex;gap:10px}
+.input{flex:1;background:#fbf9f3;border:1px solid var(--line2);color:var(--ink);font-family:inherit;font-size:19px;padding:13px 16px;border-radius:3px;outline:none;letter-spacing:.15em}
+.input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(30,58,95,.12)}
+.input::placeholder{font-size:17px;color:#b0a890;letter-spacing:0}
+.btn{background:var(--blue);color:#fff;border:none;font-family:inherit;font-size:15px;font-weight:600;padding:0 30px;border-radius:3px;cursor:pointer;letter-spacing:.1em}
+.btn:hover{background:var(--blue2)}
+.btn-gold{background:var(--gold)}
+.btn-gold:hover{background:#bd9a3e}
+.ex{margin-top:14px;font-size:12px;color:var(--ink3)}
+.ex button{background:var(--card2);color:var(--ink2);border:none;font-family:inherit;font-size:12px;padding:3px 10px;margin-right:6px;cursor:pointer;border-radius:2px}
+.ex button:hover{background:var(--blue);color:#fff}
+.stats{display:flex;gap:30px;margin:18px 0;font-size:12px;color:var(--ink2)}
+.stats b{font-size:18px;color:var(--blue);margin-right:4px}
+.banner{background:var(--card2);border-left:3px solid var(--red);padding:12px 16px;margin:20px 0 14px;font-size:14px;line-height:1.9}
+.card{background:var(--card);border:1.5px solid var(--line2);padding:0;margin-bottom:14px;box-shadow:var(--shadow)}
+.card-head{display:flex;align-items:baseline;gap:14px;background:var(--red);color:#fff;padding:10px 18px}
+.card-head .ch{font-size:22px;font-weight:900;color:#fff}
+.card-head .pos{font-size:13px;color:#f0d8d0;letter-spacing:.08em}
+.grid{display:grid;grid-template-columns:repeat(8,1fr);gap:0;border:1.5px solid var(--line2)}
+.cell{padding:8px 12px;border:1px solid var(--line2);background:#fff}
+.cell .k{font-size:11px;color:#8a7e66;letter-spacing:.08em;margin-bottom:3px;font-weight:400}
+.cell .v{font-size:15px;font-weight:700;color:#1a1a1a}
+.cell .v.phon{font-style:italic;font-family:"Times New Roman",serif;font-size:16px;color:#1e3a8a}
+.cell .v.note{font-size:12px;font-weight:400;color:#555;line-height:1.6;font-style:normal}
+.cell.span2{grid-column:span 2}
+.cell.span3{grid-column:span 3}
+.cell.break-row{grid-column:1}
+.empty{text-align:center;padding:70px 20px;color:var(--ink3)}
+.empty .big{font-size:30px;letter-spacing:.3em;margin-bottom:14px;color:var(--ink2)}
+.batch-area{width:100%;min-height:200px;background:#fbf9f3;border:1px solid var(--line2);color:var(--ink);font-family:inherit;font-size:15px;padding:14px;border-radius:3px;outline:none;resize:vertical;line-height:1.9}
+.batch-area:focus{border-color:var(--blue)}
+.batch-bar{display:flex;gap:10px;align-items:center;margin:14px 0;flex-wrap:wrap}
+.batch-summary{font-size:13px;color:var(--ink2)}
+.batch-summary b{color:var(--blue)}
+table{width:100%;border-collapse:collapse;font-size:13px;margin-top:14px;border:1.5px solid var(--line2)}
+th,td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:middle}
+th{background:var(--red);color:#fff;font-weight:600;white-space:nowrap;letter-spacing:.08em;border-color:#6e2222;font-size:12.5px}
+tr:nth-child(even) td{background:#faf7f0}
+tr:nth-child(odd) td{background:#fff}
+tr:hover td{background:#f0ebe0}
+tr.ok td{color:var(--ink)}
+tr.miss td{color:var(--ink3)}
+tr td:first-child{font-weight:700;white-space:nowrap;color:var(--red)}
+.table-wrap{overflow-x:auto;max-height:60vh;overflow-y:auto;border:1.5px solid var(--line2)}
+.filter-bar{margin:16px 0 4px;padding:10px 14px;background:var(--card2);border:1px solid var(--line);border-radius:3px;font-size:12px}
+.btn-filter{background:#fff;border:1px solid var(--line2);color:var(--blue);font-family:inherit;font-size:13px;padding:6px 16px;border-radius:3px;cursor:pointer;letter-spacing:.05em}
+.btn-filter:hover{background:var(--blue);color:#fff;border-color:var(--blue)}
+.filter-label{color:var(--ink2);font-weight:600;margin-right:8px;white-space:nowrap}
+.filter-chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.filter-chips label{display:inline-flex;align-items:center;gap:3px;background:#fff;border:1px solid var(--line);padding:5px 11px;border-radius:3px;cursor:pointer;user-select:none;font-size:13px;color:var(--ink2)}
+.filter-chips label:hover{border-color:var(--blue);color:var(--blue)}
+.filter-chips label input{margin:0;cursor:pointer}
+.filter-chips label.checked{background:var(--blue);color:#fff;border-color:var(--blue)}
+.filter-chips label.select-all-wrap{background:var(--red);color:#fff;border-color:var(--red);font-weight:600}
+.modal-mask{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal-box{background:#fff;border-radius:6px;box-shadow:0 20px 60px rgba(0,0,0,.2);max-width:640px;width:100%;max-height:80vh;display:flex;flex-direction:column;overflow:hidden}
+.modal-head{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;background:var(--red);color:#fff;font-size:15px;font-weight:600}
+.modal-close{background:none;border:none;color:#fff;font-size:18px;cursor:pointer;opacity:.8}
+.modal-close:hover{opacity:1}
+.modal-body{padding:16px 18px;overflow-y:auto;flex:1}
+.modal-foot{padding:12px 18px;border-top:1px solid var(--line);text-align:right}
+#toast{position:fixed;left:50%;bottom:36px;transform:translateX(-50%) translateY(16px);background:var(--blue);color:#fff;font-size:14px;padding:10px 22px;border-radius:3px;opacity:0;transition:all .3s;pointer-events:none;z-index:99}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+footer{border-top:1px solid var(--line);padding:20px;text-align:center;font-size:11px;color:var(--ink3);line-height:2}
+@media(max-width:720px){
+  .grid{grid-template-columns:repeat(4,1fr)}
+  .row{flex-direction:column}
+  .btn{padding:12px}
+  main{padding:20px 14px 50px}
+  .panel{padding:16px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hd">
+    <div class="brand" id="brand">
+      <div class="seal">切</div>
+      <div>
+        <h1>音切音韻地位查詢</h1>
+        <div class="sub">MCQA-1 · 中古音地位檢索</div>
+      </div>
+    </div>
+    <div class="hd-tools">
+      <button id="backBtn" style="display:none">← 返回單查</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- 单查视图 -->
+  <section class="view active" id="view-single">
+    <div class="tabs">
+      <button class="tab active" data-mode="zhiyin">單字直音</button>
+      <button class="tab" data-mode="fanqie">兩字反切</button>
+      <div style="margin-left:auto">
+        <button class="btn btn-filter" id="filterToggle">篩選顯示信息 ▾</button>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="tip" id="modeTip">輸入一個漢字，查詢其音韻地位。</div>
+      <div class="row">
+        <div style="flex:0 0 240px;margin-top:6px">
+          <div style="font-size:14px;font-weight:600;color:#5a4a3a;margin-bottom:3px">被注字</div>
+          <input class="input" id="bz" placeholder="（可選，用於異切提醒）" autocomplete="off" style="width:100%;font-size:19px;height:42px">
+        </div>
+        <div style="flex:2;margin-top:6px">
+          <div style="font-size:14px;font-weight:600;color:#5a4a3a;margin-bottom:3px">注音</div>
+          <div style="display:flex;gap:8px">
+            <input class="input" id="kw" placeholder="例：東" autocomplete="off" style="flex:1;height:42px">
+            <button class="btn" id="goBtn" style="height:42px">查詢</button>
+          </div>
+          <div class="ex" id="examples" style="margin-top:8px"></div>
+        </div>
+      </div>
+    </div>
+    <div id="resultArea">
+      <div class="empty"><div class="big">音 切 檢 索</div><p>單字查地位 · 兩字拼反切</p></div>
+    </div>
+  </section>
+
+  <!-- 批量视图（隐藏通道） -->
+  <section class="view" id="view-batch">
+    <div class="panel">
+      <div class="tip">批量音切查詢：每行一個，格式：被注字:音切（如 東:德紅）；直音可直接寫字（如 東）。單次最多 5000 條。</div>
+      <textarea class="batch-area" id="batchInput" placeholder="東&#10;古&#10;東:德紅&#10;都宗&#10;胡谷"></textarea>
+      <div class="batch-bar">
+        <button class="btn btn-gold" id="batchGo">批量查詢</button>
+        <button class="btn" id="exportCsv" style="display:none">導出 CSV</button>
+        <span class="batch-summary" id="batchSummary"></span>
+      </div>
+      <div class="table-wrap" id="tableWrap" style="display:none">
+        <table id="batchTable">
+          <thead><tr>
+            <th>輸入</th><th>音韻地位</th><th>異切提醒(寬)</th><th>狀態</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="modal-mask" id="filterModal" style="display:none">
+  <div class="modal-box">
+    <div class="modal-head">
+      <span>篩選顯示信息</span>
+      <button class="modal-close" id="filterClose">✕</button>
+    </div>
+    <div class="modal-body" id="filterChips"></div>
+    <div class="modal-foot">
+      <button class="btn btn-gold" id="filterDone">完成</button>
+    </div>
+  </div>
+</div>
+
+<footer>MCQA-1 音韻地位數據庫</footer>
+<div id="toast"></div>
+
+<script>
+/* ===== 部署后填函数 URL（末尾不加斜杠） ===== */
+const API_BASE = "https://mcqa-search-vkvqalalmw.cn-hangzhou.fcapp.run";
+/* =========================================== */
+
+const $=id=>document.getElementById(id);
+let mode="zhiyin", lastBatchRows=[];
+const EX={zhiyin:["東","古","他：陀","百：博"],fanqie:["德紅","古慕","百：博陌","東：德紅"]};
+
+function toast(m){const t=$("toast");t.textContent=m;t.classList.add("show");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("show"),2000)}
+function esc(s){return String(s??"").replace(/&/g,"&amp;").replace(/</g,"&lt;")}
+
+/* ---- 视图切换 ---- */
+function showBatch(on){
+  $("view-single").classList.toggle("active",!on);
+  $("view-batch").classList.toggle("active",on);
+  $("backBtn").style.display=on?"":"none";
+  if(on) $("batchInput").focus();
+}
+$("backBtn").addEventListener("click",()=>{showBatch(false);location.hash=""});
+
+/* 隐藏通道：URL 加 #batch、或连续点左上角印章 5 次进入批量页 */
+let sealClicks=0, sealTimer=null;
+$("brand").addEventListener("click",()=>{
+  sealClicks++; clearTimeout(sealTimer);
+  sealTimer=setTimeout(()=>sealClicks=0,600);
+  if(sealClicks>=5){sealClicks=0;showBatch(true);toast("已進入批量通道")}
+});
+if(location.hash==="#batch") showBatch(true);
+
+/* ---- 单查 ---- */
+function setMode(m){
+  mode=m;
+  document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active",b.dataset.mode===m));
+  $("modeTip").textContent=m==="zhiyin"?"輸入一個漢字，查詢其音韻地位。":"輸入兩個漢字：上字取聲母，下字取韻調呼等。";
+  $("kw").placeholder=m==="zhiyin"?"例：東":"例：德紅";
+  $("bz").placeholder="（可選，用於異切提醒）";
+  $("kw").value="";$("bz").value="";$("kw").focus();renderEx();
+}
+document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>setMode(b.dataset.mode)));
+function renderEx(){
+  $("examples").innerHTML="示例："+EX[mode].map(c=>`<button data-kw="${c}">${c}</button>`).join("");
+  $("examples").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{
+    const c=b.dataset.kw;
+    if(c.includes("：")){
+      const parts=c.split("：");
+      $("bz").value=parts[0];
+      $("kw").value=parts[1];
+    } else {
+      $("bz").value="";
+      $("kw").value=c;
+    }
+    doSearch();
+  }));
+}
+async function doSearch(){
+  const q=$("kw").value.trim();
+  if(!q){toast("請輸入查詢內容");return}
+  const n=[...q].length;
+  if(mode==="zhiyin"&&n!==1){toast("直音模式請輸入一個漢字");return}
+  if(mode==="fanqie"&&n!==2){toast("反切模式請輸入兩個漢字");return}
+  if(!API_BASE){toast("尚未配置接口地址");return}
+  $("resultArea").innerHTML='<div class="empty"><div class="big">查 詢 中</div></div>';
+  try{
+    const bz=$("bz").value.trim();
+    const url=API_BASE+"/?q="+encodeURIComponent(q)+(bz?("&bz="+encodeURIComponent(bz)):"");
+    const r=await fetch(url);
+    if(!r.ok){throw new Error("接口 HTTP "+r.status+"（域名可能尚未生效，请稍后再试）")}
+    const d=await r.json();
+    if(d.code!==0){$("resultArea").innerHTML=`<div class="empty"><div class="big">查 無 此 音</div><p>${esc(d.error||"未知錯誤")}</p></div>`;return}
+    if(d.type==="zhiyin") renderSingle(d);
+    else if(d.type==="fanqie") renderFanqie(d);
+  }catch(e){$("resultArea").innerHTML=`<div class="empty"><div class="big">連 接 失 敗</div><p>${esc(e.message)}</p></div>`}
+}
+let lastResult=null;
+const ALL_FIELDS=["音韻地位","聲","韻","調","呼","等","攝","重紐","聲組","韻系","九音","清濁","洪細","舒促","韻尾","中古聲母","中古韻母","中古擬音","中古十二家擬音","上古韻部","上古聲母","上古韻母","上古擬音","異切提醒(寬)"];
+let savedFields=JSON.parse(localStorage.getItem("mcqa_fields")||"null");
+let visibleFields=savedFields?new Set(savedFields):new Set(ALL_FIELDS);
+function saveFields(){localStorage.setItem("mcqa_fields",JSON.stringify([...visibleFields]))}
+function cardHtml(m){
+  const phonLabels=["中古擬音","中古聲母","中古韻母","上古擬音","上古聲母","上古韻母","中古十二家擬音"];
+  const shangguLabels=["上古韻部","上古聲母","上古韻母","上古擬音"];
+  const zhongguLabels=["中古聲母","中古韻母","中古擬音","中古十二家擬音"];
+  const yiqieField=m.fields.find(f=>f.label==="異切提醒(寬)");
+  const order=["聲","韻","調","呼","等","攝","重紐","聲組","韻系","九音","清濁","洪細","舒促","韻尾","異切提醒(嚴)"];
+  const baseFields=m.fields.filter(f=>order.includes(f.label)&&visibleFields.has(f.label)&&f.label!=="音韻地位"&&!shangguLabels.includes(f.label)&&!zhongguLabels.includes(f.label));
+  baseFields.sort((a,b)=>order.indexOf(a.label)-order.indexOf(b.label));
+  const normalCells=baseFields.map((f,i)=>{
+    const v=f.value||"";
+    let cls="cell";
+    if(f.label==="異切提醒(嚴)") cls+=" span2";
+    if(i===7) cls+=" break-row";
+    if(f.label==="重紐"||f.label==="韻尾") cls+=" span2";
+    const isPhon=phonLabels.includes(f.label);
+    const vcls=isPhon?'v phon':'v';
+    return `<div class="${cls}"><div class="k">${f.label}</div><div class="${vcls}">${v||'<span style="color:var(--ink3)">—</span>'}</div></div>`;
+  }).join("");
+  let zhongguHtml="";
+  const zgFields=m.fields.filter(f=>zhongguLabels.includes(f.label)&&visibleFields.has(f.label));
+  if(zgFields.length){
+    const breakHtml=`<div style="grid-column:1/-1;height:0;padding:0;border:none"></div>`;
+    const cells=zgFields.map(f=>{
+      const v=f.value||"";
+      const isPhon=phonLabels.includes(f.label);
+      const vcls=isPhon?'v phon':(f.label==="中古十二家擬音"?'v note':'v');
+      const span=f.label==="中古十二家擬音"?5:1;
+      return `<div class="cell" style="grid-column:span ${span}"><div class="k">${f.label}</div><div class="${vcls}">${v||'<span style="color:var(--ink3)">—</span>'}</div></div>`;
+    }).join("");
+    const used=zgFields.reduce((s,f)=>s+(f.label==="中古十二家擬音"?5:1),0);
+    const pad=8-used;
+    const padHtml=pad>0?`<div class="cell" style="grid-column:span ${pad};border-right:none"></div>`:"";
+    zhongguHtml=breakHtml+cells+padHtml;
+  }
+  let shangguHtml="";
+  const shangguFields=m.fields.filter(f=>shangguLabels.includes(f.label)&&visibleFields.has(f.label));
+  if(shangguFields.length){
+    const breakHtml=`<div style="grid-column:1/-1;height:0;padding:0;border:none"></div>`;
+    const cells=shangguFields.map(f=>{
+      const v=f.value||"";
+      const isPhon=phonLabels.includes(f.label);
+      const vcls=isPhon?'v phon':'v';
+      return `<div class="cell" style="grid-column:span 2"><div class="k">${f.label}</div><div class="${vcls}">${v||'<span style="color:var(--ink3)">—</span>'}</div></div>`;
+    }).join("");
+    const pad=8-shangguFields.length*2;
+    const padHtml=pad>0?`<div class="cell" style="grid-column:span ${pad};border-right:none"></div>`:"";
+    shangguHtml=breakHtml+cells+padHtml;
+  }
+  let yiqieHtml="";
+  if(yiqieField&&visibleFields.has("異切提醒(寬)")){
+    yiqieHtml=`<div style="grid-column:1/-1;background:#fdf3e7;border:1.5px solid var(--line2);border-top:none;padding:10px 16px;display:flex;align-items:center;gap:12px">
+      <span style="font-size:13px;color:#8a6d3b;font-weight:600">${yiqieField.label}</span>
+      <span style="font-size:18px;font-weight:700;color:#b8541a;letter-spacing:.1em">${yiqieField.value||'<span style="color:var(--ink3);font-weight:400">—</span>'}</span>
+    </div>`;
+  }
+  return `<div class="card"><div class="card-head"><span class="ch">${esc(m.char)}</span><span class="pos">${esc(m.fields[0].value||"")}</span></div><div class="grid">${normalCells}${zhongguHtml}${shangguHtml}${yiqieHtml}</div></div>`;
+}
+function buildFilterBar(){
+  $("filterChips").innerHTML=`<div style="width:100%;margin-bottom:10px"><label class="select-all-wrap" style="width:100%;justify-content:center;padding:8px"><input type="checkbox" id="selectAll" ${visibleFields.size===ALL_FIELDS.length?"checked":""}>全選 / 全不選</label></div>`+ALL_FIELDS.map(l=>`<label class="${visibleFields.has(l)?"checked":""}"><input type="checkbox" value="${l}" ${visibleFields.has(l)?"checked":""}>${l}</label>`).join("");
+  $("filterChips").querySelectorAll("input").forEach(cb=>{
+    if(cb.id==="selectAll"){
+      cb.addEventListener("change",()=>{
+        const checkAll=cb.checked;
+        visibleFields=checkAll?new Set(ALL_FIELDS):new Set();
+        saveFields();
+        $("filterChips").querySelectorAll("input").forEach(c=>{
+          if(c.id!=="selectAll"){c.checked=checkAll;c.parentElement.classList.toggle("checked",checkAll);}
+        });
+        renderLast();
+      });
+    }else{
+      cb.addEventListener("change",()=>{
+        if(cb.checked) visibleFields.add(cb.value); else visibleFields.delete(cb.value);
+        cb.parentElement.classList.toggle("checked",cb.checked);
+        const all=$("filterChips").querySelectorAll("input:not(#selectAll)");
+        const checkedCnt=[...all].filter(c=>c.checked).length;
+        $("selectAll").checked=checkedCnt===all.length;
+        saveFields();
+        renderLast();
+      });
+    }
+  });
+}
+$("filterToggle").addEventListener("click",()=>{buildFilterBar();$("filterModal").style.display="flex"});
+$("filterClose").addEventListener("click",()=>{$("filterModal").style.display="none"});
+$("filterDone").addEventListener("click",()=>{$("filterModal").style.display="none"});
+$("filterModal").addEventListener("click",e=>{if(e.target===$("filterModal"))$("filterModal").style.display="none"});
+function renderLast(){
+  if(!lastResult) return;
+  if(lastResult.type==="zhiyin"){
+    $("resultArea").innerHTML=`<div class="banner">直音查詢：<b>${esc(lastResult.input)}</b> 的音韻地位</div>`+lastResult.matches.map(cardHtml).join("");
+  }else{
+    const hu = lastResult.xia_hu === '開' ? '開口' : lastResult.xia_hu === '合' ? '合口' : lastResult.xia_hu;
+    $("resultArea").innerHTML=`<div class="banner">反切拼合：<b>${esc(lastResult.input)}</b><br>上字 <b style="color:var(--red);font-size:17px">${esc(lastResult.shang)}</b> 取 ${esc(lastResult.shang_sheng)}母 · 下字 <b style="color:var(--red);font-size:17px">${esc(lastResult.xia)}</b> 取 ${esc(lastResult.xia_yun)}韻${esc(lastResult.xia_diao)}聲${esc(hu)}${esc(lastResult.xia_deng)}等</div>`+lastResult.matches.map(cardHtml).join("");
+  }
+}
+function renderSingle(d){lastResult=d;renderLast();}
+function renderFanqie(d){lastResult=d;renderLast();}
+$("goBtn").addEventListener("click",doSearch);
+$("kw").addEventListener("keydown",e=>{if(e.key==="Enter")doSearch()});
+
+/* ---- 批量 ---- */
+$("batchGo").addEventListener("click",async()=>{
+  const raw=$("batchInput").value.trim();
+  if(!raw){toast("請粘貼批量內容");return}
+  if(!API_BASE){toast("尚未配置接口地址");return}
+  $("batchSummary").textContent="查詢中…";
+  try{
+    const r=await fetch(API_BASE+"/?words="+encodeURIComponent(raw));
+    if(!r.ok){toast("接口連接失敗（域名尚未生效）");return}
+    const d=await r.json();
+    if(d.code!==0){toast(d.error||"查詢失敗");return}
+    lastBatchRows=d.rows;
+    const tb=document.querySelector("#batchTable tbody");
+    tb.innerHTML=d.rows.map(row=>{
+      const ok=row.status==="ok";
+      return `<tr class="${ok?"ok":"miss"}">
+        <td>${esc(row.input)}</td>
+        <td>${esc(row.pos||"")}</td>
+        <td>${esc(row.yiqie_kuan||"")}</td>
+        <td>${ok?"✓":esc(row.message||"未命中")}</td>
+      </tr>`;
+    }).join("");
+    $("tableWrap").style.display="";
+    $("exportCsv").style.display="";
+    $("batchSummary").innerHTML=`共 <b>${d.total}</b> 條 · 成功 <b style="color:var(--green)">${d.ok}</b> · 未命中 <b style="color:var(--red2)">${d.miss}</b>`;
+  }catch(e){toast("請求失敗："+e.message)}
+});
+$("exportCsv").addEventListener("click",()=>{
+  const head=["輸入","類型","音韻地位","聲","韻","調","呼","等","攝","重紐","中古聲母","中古韻母","中古擬音","上古韻母","異切(嚴)","異切(寬)","命中","示例字頭","狀態"];
+  const lines=[head.join(",")];
+  lastBatchRows.forEach(r=>{
+    lines.push([r.input,r.type==="fanqie"?"反切":(r.type==="zhiyin"?"直音":""),r.pos||"",r.sheng||"",r.yun||"",r.diao||"",r.hu||"",r.deng||"",r.she||"",r.zhongniu||"",r.zhonggu_shengmu||"",r.zhonggu_yunmu||"",r.ongon||"",r.shanggu_yunmu||"",r.yiqie_yan||"",r.yiqie_kuan||"",r.hits||"",r.examples||"",r.status==="ok"?"✓":(r.message||"未命中")].join(","));
+  });
+  const blob=new Blob(["\uFEFF"+lines.join("\n")],{type:"text/csv;charset=utf-8"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="音切批量查詢.csv";a.click();
+});
+
+/* ---- 初始化 ---- */
+setMode("zhiyin");
+if(API_BASE){fetch(API_BASE+"/?q=").then(r=>r.json()).then(d=>{if(d.code===0){$("statChars").textContent=d.total_chars.toLocaleString();$("statCombos").textContent=d.total_combos.toLocaleString()}}).catch(()=>{})}
+</script>
+</body>
+</html>
