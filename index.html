@@ -140,7 +140,7 @@ footer{border-top:1px solid var(--line);padding:20px;text-align:center;font-size
       <div class="row">
         <div style="flex:0 0 200px;margin-top:6px">
           <div style="font-size:14px;font-weight:600;color:#5a4a3a;margin-bottom:3px">被注字</div>
-          <input class="input" id="bz" placeholder="（可選，用於異切提醒）" autocomplete="off" style="width:100%;font-size:19px;height:42px">
+          <input class="input" id="bz" placeholder="可選，用於異切提醒" autocomplete="off" style="width:100%;font-size:19px;height:42px">
         </div>
         <div style="flex:2;margin-top:6px">
           <div style="font-size:14px;font-weight:600;color:#5a4a3a;margin-bottom:3px">注音</div>
@@ -231,7 +231,7 @@ function setMode(m){
   document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active",b.dataset.mode===m));
   $("modeTip").textContent=m==="zhiyin"?"輸入一個漢字，查詢其音韻地位。":"輸入兩個漢字：上字取聲母，下字取韻調呼等。";
   $("kw").placeholder=m==="zhiyin"?"例：東":"例：德紅";
-  $("bz").placeholder="（可選，用於異切提醒）";
+  $("bz").placeholder="可選，用於異切提醒";
   $("kw").value="";$("bz").value="";$("kw").focus();renderEx();
 }
 document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>setMode(b.dataset.mode)));
